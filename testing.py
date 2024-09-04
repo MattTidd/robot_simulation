@@ -68,8 +68,8 @@ def spawnable_space(body,border,buffer):
 
         # check for border points in x and y direction:
 
-        for dx in range(-buffer, buffer +1):
-            for dy in range(-buffer, buffer +1):
+        for dx in range(-buffer, buffer + 1):
+            for dy in range(-buffer, buffer + 1):
                 neighbour = (x + dx, y + dy)
 
                 # if exists in the border set, invert flag and break
@@ -83,12 +83,29 @@ def spawnable_space(body,border,buffer):
             if not is_spawnable:
                 break
 
-    # else if the point is spawnable, keep it:
+        # else if the point is spawnable, keep it:
 
         if is_spawnable:
             spawnable.append(point)
 
     return spawnable
+
+# determine the equally spaced spawnable sites for robots/tasks:
+
+def spawnable_sites(spawnable,buffer):
+    spawnable_list = [tuple(point) for point in spawnable]
+    spawnable_set = set(spawnable_list)
+
+    xmin, xmax = min(spawnable[:,0]), max(spawnable[:,0])
+    ymin, ymax = min(spawnable[:,1]), max(spawnable[:,1])
+
+    x_spaced = np.arange(xmin, xmax+1, buffer)
+    y_spaced = np.arange(ymin, ymax+1, buffer)
+
+    grid = [(x,y) for x in x_spaced for y in y_spaced]
+    sites = np.array([point for point in grid if point in spawnable_set])
+
+    return sites
 
 # get screen size:
 
@@ -152,8 +169,25 @@ resolution = 0.05
 w_frac = 0.60
 h_frac = 0.80
 
-body, border = read_map('blob1_map.png')
+body, border = read_map('blob2_map.png')
 spawnable = np.array(spawnable_space(body,border,buffer))
+
+# The above code reads a given map and determines the location of the border, as well as the white space contained within
+# said border. It then loosely scales back the white space approximately 0.2m from the border, and determines the spawnable space 
+# wherein robots can spawn without being too close to the wall.
+
+# The next step is to analyze the spawnable space and break it up into equally separated spawn sites, wherein robots can spawn
+# without overlapping with one another. This is handled by the following function:
+
+sites = spawnable_sites(spawnable, 4)
+
+# The function call generates a grid of evenly spaced points between the minimum and maxiumum range of both the x and y data,
+# and this grid is then compared against the set of all spawnable area and the points that coincide within both are kept. 
+# This allows for an array of all possible evenly spaced points, which are separated by 20cm in both the x and y directions.
+
+# I am now going to work on create a class of robots, which can have randomly spawned locations from this array of possible sites.
+# I want to represent the robots on the map as circles of radius 5-10 cm, which will then appear on the map. Similarly, the task will appear
+# within a random location as well. 
 
 fig_width, fig_height, left, top = get_position(w_frac, h_frac)
 
@@ -162,9 +196,11 @@ fig.set_size_inches(fig_width / 100, fig_height / 100)
 ax.set_facecolor(str(205/255))
 ax.set_xlim(auto = True)
 ax.set_ylim(auto = True)
-ax.scatter(resolution*body[:,0],resolution*body[:,1], c = 'white')
-ax.scatter(resolution*border[:,0],resolution*border[:,1], c = 'black')
-ax.scatter(resolution*spawnable[:,0],resolution*spawnable[:,1], color =[0.65, 0.80, 1.0])
+ax.scatter(body[:,0],body[:,1], c = 'white')
+ax.scatter(border[:,0],border[:,1], c = 'black')
+ax.scatter(spawnable[:,0],spawnable[:,1], color =[0.65, 0.80, 1.0])
+ax.scatter(sites[:,0], sites[:,1], c = 'red')
 plt.ion()
 
 fig_display(fig, fig_width, fig_height, (int(left), int(top)))
+
