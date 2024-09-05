@@ -190,7 +190,6 @@ for total_robots in range(1, m+1):
             load = 0,
             position = task_spawner(sites)
         )
-
     # then measurement robots:
     for sensor_robot in range(1, y+1):
         robots[robot_name] = robot(
@@ -202,7 +201,7 @@ for total_robots in range(1, m+1):
             position = task_spawner(sites)
         )
 
-print(robots)
+# need to query the each robot to check for success 
         
 
 
