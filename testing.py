@@ -9,8 +9,9 @@ import os
 import sys
 import tkinter as tk
 import subprocess
+import random
 
-########## Define Functions ##########
+########## Define Functions and Classes ##########
 
 # generate a blank png for use in mapping:
 
@@ -93,6 +94,10 @@ def spawnable_space(body,border,buffer):
 # determine the equally spaced spawnable sites for robots/tasks:
 
 def spawnable_sites(spawnable,buffer):
+    # The function call generates a grid of evenly spaced points between the minimum and maxiumum range of both the x and y data,
+    # and this grid is then compared against the set of all spawnable area and the points that coincide within both are kept. 
+    # This allows for an array of all possible evenly spaced points, which are separated by 20cm in both the x and y directions.
+
     spawnable_list = [tuple(point) for point in spawnable]
     spawnable_set = set(spawnable_list)
 
@@ -107,100 +112,213 @@ def spawnable_sites(spawnable,buffer):
 
     return sites
 
-# get screen size:
+# randomnly spawn tasks:
 
-def get_position(w_frac,h_frac):
-    root = tk.Tk()                              # start root window
-    screen_width = root.winfo_screenwidth()     # grab screen width
-    screen_height = root.winfo_screenheight()   # grab screen height
-    root.destroy()                              # close root window
+def task_spawner(sites):
+    x,y = random.choice(sites)
+    task = np.array([x,y])
+    return task
 
-    fig_width = int(screen_width * w_frac)      # width of figure
-    fig_height = int(screen_height * h_frac)    # height of figure
+class robot:
 
-    left = (screen_width - fig_width) / 2       # distance on left
-    top = (screen_height - fig_height) / 2      # distance on top
+    # constructor to initialize attributes:
+    def __init__(self, id, sensor, locomotion, battery, load, position):
+        self.id = id
+        self.sensor = sensor
+        self.locomotion = locomotion
 
-    return fig_width, fig_height, left, top     # return values
+        if self.locomotion == "Aerial":
+            self.weight = 1.0
+        elif self.locomotion == "4-Wheeled Omnidirectional":
+            self.weight = 1.25
+        elif self.locomotion == "Differential Drive":
+            self.weight = 1.50
+        else:
+            self.weight = 1.75
 
-# controlled display function:
+        self.battery = battery
+        self.load = load
+        self.position = position
 
-def fig_display(fig, width, height, placement):
-
-    # define button press function:
-    def on_button_press():
-        subprocess.run(["powershell","clear"])
-        print('Figure Terminated!')
-        window.destroy()
-        os._exit(0)
-
-    # create an instance of the window, set the name, size, and placement:
-    window = tk.Tk()
-    window.title('Interactive Map of the Environment')
-    window.geometry(f'{width}x{height}+{placement[0]}+{placement[1]}')
-
-    # place figure onto the window:
-    canvas = tkagg.FigureCanvasTkAgg(fig, master = window)
-    canvas.draw()
-
-    # set the toolbar:
-    toolbar_frame = tk.Frame(window)
-    toolbar_frame.pack(side=tk.TOP, fill=tk.X)
-    toolbar = NavigationToolbar2Tk(canvas, toolbar_frame)
-    toolbar.update()
-
-    # place the button:
-    button = tk.Button(window, text = 'Close Window', command = on_button_press)
-    button.pack(side=tk.BOTTOM, pady=5)
-
-    # padding:
-    canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand = True)
-
-    # main gui function:
-    window.mainloop()
+    def display_robot_info(self):
+        print(f"Robot", self.id," has the following: \n Sensor:", self.sensor, "\n Mode of Locomotion:", self.locomotion,
+              "\n Movement Weight:", self.weight, "\n Battery Level:", self.battery, "\n Load History:", self.load,
+              "\n Position:", self.position)
 
 ########## Main ##########
 
 # I want to load the maps generated within ROS as pngs, and extract the XY coordinates of the operable white space
-# and plot this space as the environment for spawning tasks and robots
+# and plot this space as the environment for spawning tasks and robots. First define the following:
 
 buffer = 4
 resolution = 0.05
 w_frac = 0.60
 h_frac = 0.80
 
-body, border = read_map('blob2_map.png')
+# Step 1 - read map:
+body, border = read_map('blob1_map.png')
+
+# Step 2 - determine spawnable space:
 spawnable = np.array(spawnable_space(body,border,buffer))
 
-# The above code reads a given map and determines the location of the border, as well as the white space contained within
-# said border. It then loosely scales back the white space approximately 0.2m from the border, and determines the spawnable space 
-# wherein robots can spawn without being too close to the wall.
-
-# The next step is to analyze the spawnable space and break it up into equally separated spawn sites, wherein robots can spawn
-# without overlapping with one another. This is handled by the following function:
-
+# Step 3 - determine spawnable sites:
 sites = spawnable_sites(spawnable, 4)
 
-# The function call generates a grid of evenly spaced points between the minimum and maxiumum range of both the x and y data,
-# and this grid is then compared against the set of all spawnable area and the points that coincide within both are kept. 
-# This allows for an array of all possible evenly spaced points, which are separated by 20cm in both the x and y directions.
+# Step 4 - randomly spawn a task:
+task = (task_spawner(sites))
+
+# Step 5 - robots:
+
+m = random.randrange(2,6)
+y = random.randrange(1,m)
+x = m-y
+robots = {}
+
+print('There are', m, "total robots, with", x, "camera equipped robots and", y, "sensor equipped robots")
+
+# now need to make that many robot classes:
+
+for total_robots in range(1, m+1):
+    robot_name = f"robot{total_robots}"
+    # camera robots first:
+    for camera_robot in range(1, x+1):
+        robots[robot_name] = robot(
+            id = total_robots,
+            sensor = "Camera",
+            locomotion = random.choice(["Aerial", "4-Wheeled Omnidirectional", "Differential Drive", "2-Legged"]),
+            battery = random.randrange(0, 1),
+            load = 0,
+            position = task_spawner(sites)
+        )
+
+    # then measurement robots:
+    for sensor_robot in range(1, y+1):
+        robots[robot_name] = robot(
+            id = total_robots,
+            sensor = "Measurement",
+            locomotion = random.choice(["Aerial", "4-Wheeled Omnidirectional", "Differential Drive", "2-Legged"]),
+            battery = random.randrange(0, 1),
+            load = 0,
+            position = task_spawner(sites)
+        )
+
+print(robots)
+        
+
+
+# robot1 = robot(1, "Camera", "4-Wheeled", 1.25, 0.80, 0.0, task_spawner(sites))
+# robot1.display_robot_info()
+
+
+
+
+
+
+# For contextual visualization, the pixels will be converted to meters:
+
+# body, border, spawnable, sites = pixel2meter(body, border, spawnable, sites, resolution)
 
 # I am now going to work on create a class of robots, which can have randomly spawned locations from this array of possible sites.
 # I want to represent the robots on the map as circles of radius 5-10 cm, which will then appear on the map. Similarly, the task will appear
 # within a random location as well. 
 
-fig_width, fig_height, left, top = get_position(w_frac, h_frac)
 
-fig, ax  = plt.subplots()
-fig.set_size_inches(fig_width / 100, fig_height / 100)
-ax.set_facecolor(str(205/255))
-ax.set_xlim(auto = True)
-ax.set_ylim(auto = True)
-ax.scatter(body[:,0],body[:,1], c = 'white')
-ax.scatter(border[:,0],border[:,1], c = 'black')
-ax.scatter(spawnable[:,0],spawnable[:,1], color =[0.65, 0.80, 1.0])
-ax.scatter(sites[:,0], sites[:,1], c = 'red')
-plt.ion()
 
-fig_display(fig, fig_width, fig_height, (int(left), int(top)))
+# STORAGE:
 
+# ----------------------------------------------------------------------------
+
+# # Step X - visualize:
+# fig_width, fig_height, left, top = get_position(w_frac, h_frac)
+# fig = plt.figure()
+# fig.set_size_inches(fig_width / 100, fig_height / 100)
+
+# fig_display(fig, fig_width, fig_height, (int(left), int(top)), sites)
+
+# ----------------------------------------------------------------------------
+
+# # convert to meters:
+
+# def pixel2meter(body, border, spawnable, sites, resolution):
+#     a, b, c, d = body*resolution, border*resolution, spawnable*resolution, sites*resolution
+#     return a, b, c, d
+
+# # get screen size:
+
+# def get_position(w_frac,h_frac):
+#     root = tk.Tk()                              # start root window
+#     screen_width = root.winfo_screenwidth()     # grab screen width
+#     screen_height = root.winfo_screenheight()   # grab screen height
+#     root.destroy()                              # close root window
+
+#     fig_width = int(screen_width * w_frac)      # width of figure
+#     fig_height = int(screen_height * h_frac)    # height of figure
+
+#     left = (screen_width - fig_width) / 2       # distance on left
+#     top = (screen_height - fig_height) / 2      # distance on top
+
+#     return fig_width, fig_height, left, top     # return values
+
+# ----------------------------------------------------------------------------
+
+# def fig_display(fig, width, height, placement, sites):
+
+#     # create an instance of the window, set the name, size, and placement:
+#     window = tk.Tk()
+#     window.title('Interactive Map of the Environment')
+#     window.geometry(f'{width}x{height}+{placement[0]}+{placement[1]}')
+
+#     # place figure onto the window:
+#     canvas = tkagg.FigureCanvasTkAgg(fig, master = window)
+
+#     # create subplot: 
+#     ax = fig.add_subplot(111)
+
+#     task_marker = None
+
+#     def spawn_task():
+#         nonlocal task_marker
+#         x,y = random.choice(sites)
+#         task_marker = ax.plot(x, y, 'ro', markersize = 15, label = 'Task')[0]
+
+#         ax.clear()
+#         ax.set_xlim(auto = True)
+#         ax.set_ylim(auto = True)
+#         ax.scatter(body[:,0],body[:,1], c = 'white')
+#         ax.scatter(border[:,0],border[:,1], c = 'black')
+#         ax.scatter(spawnable[:,0],spawnable[:,1], color =[183/255, 219/255, 206/255])
+#         plt.ion()
+
+#         x,y = random.choice(sites)
+#         task_marker = ax.plot(x, y, 'ro', markersize = 15, label = 'Task')[0]
+#         ax.legend(['Floorspace','Border','Spawnable Space','Task'])
+
+#         canvas.draw()
+
+#     # define closing button press function:
+#     def on_button_press():
+#         subprocess.run(["powershell","clear"])
+#         print('Figure Terminated!')
+#         window.destroy()
+#         os._exit(0)
+
+#     # set the toolbar:
+#     toolbar_frame = tk.Frame(window)
+#     toolbar_frame.pack(side=tk.TOP, fill=tk.X)
+#     toolbar = NavigationToolbar2Tk(canvas, toolbar_frame)
+#     toolbar.update()
+
+#     # Add a button to spawn tasks
+#     spawn_button = tk.Button(window, text="Spawn New Task", command=spawn_task)
+#     spawn_button.pack()
+    
+#     # place the button:
+#     button = tk.Button(window, text = 'Close Window', command = on_button_press)
+#     button.pack(side=tk.BOTTOM, pady=5)
+
+#     # padding:
+#     canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand = True)
+
+#     # main gui function:
+#     spawn_task()
+#     window.mainloop()
