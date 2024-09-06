@@ -275,7 +275,7 @@ def fig_display(fig, width, height, placement, sites):
         for widget in sidebar_frame.winfo_children():
             widget.destroy()
 
-        label_width = 30 # in characters
+        label_width = 40 # in characters
         
         for id, robot in robots.items():
             attributes = (f"Robot ID: {robot.id}\n"
