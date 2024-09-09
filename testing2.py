@@ -208,7 +208,7 @@ def fig_display(fig, width, height, placement, sites):
     def spawn_task():
         nonlocal task_marker
         x,y = random.choice(sites)
-        task_marker = ax.plot(x, y, 'ro', markersize = 5, label = 'Task')[0]
+        task_marker = ax.plot(x, y, 'ro', markersize = 2, label = 'Task')[0]
         update_display(robots)
 
     def terminate_figure_button():
@@ -288,6 +288,7 @@ def fig_display(fig, width, height, placement, sites):
             attributes = (f"Robot ID: {robot.id}\n"
                            f"Sensor: {robot.sensor}\n"
                            f"Mode of Locomotion: {robot.locomotion}\n"
+                           f"Movement Weight: {robot.weight}\n"
                            f"Position: {robot.position}\n"
                            f"Battery: {robot.battery}\n"
                            f"Load History: {robot.load}")
