@@ -63,7 +63,7 @@ class Robot:
                 f"Load History: {self.load}\n"
                 f"Current Position: {self.position} ")
 
-with open('new_saved_data.pkl', 'rb') as file:
+with open('saved_data.pkl', 'rb') as file:
     loaded_data = pickle.load(file)
 
 ## Open the variables:

@@ -231,7 +231,7 @@ def fig_display(fig, width, height, placement, sites):
         }
 
         # save the dictionary to a file:
-        with open('new_saved_data.pkl', 'wb') as file:
+        with open('saved_data.pkl', 'wb') as file:
             pickle.dump(saved_dictionary, file)
         
     def randomize_position_button():
