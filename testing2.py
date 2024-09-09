@@ -30,7 +30,7 @@ class Robot:
         self.sensor = sensor
         self.locomotion = locomotion
 
-        if self.locomotion == "Aerial":
+        if self.locomotion == "Drone":
             a = random.uniform(-0.10,0.10)
             self.weight = round(1.00 + a*random.random(),2)
         elif self.locomotion == "4-Wheeled":
@@ -49,8 +49,8 @@ class Robot:
 
     # for when user wants to randomize the attributes of the robots:
     def randomize_attributes(self):
-        self.locomotion = random.choice(["Aerial", "4-Wheeled", "Differential Drive", "2-Legged"])
-        if self.locomotion == "Aerial":
+        self.locomotion = random.choice(["Drone", "4-Wheeled", "Differential Drive", "2-Legged"])
+        if self.locomotion == "Drone":
             a = random.uniform(-0.10,0.10)
             self.weight = round(1.00 + a*random.random(),2)
         elif self.locomotion == "4-Wheeled":
@@ -208,7 +208,7 @@ def fig_display(fig, width, height, placement, sites):
     def spawn_task():
         nonlocal task_marker
         x,y = random.choice(sites)
-        task_marker = ax.plot(x, y, 'ro', markersize = 15, label = 'Task')[0]
+        task_marker = ax.plot(x, y, 'ro', markersize = 5, label = 'Task')[0]
         update_display(robots)
 
     def terminate_figure_button():
@@ -238,7 +238,7 @@ def fig_display(fig, width, height, placement, sites):
                 robots[robot_name] = Robot(
                     id = total_robots,
                     sensor = "Camera",
-                    locomotion = random.choice(["Aerial", "4-Wheeled", "Differential Drive", "2-Legged"]),
+                    locomotion = random.choice(["Drone", "4-Wheeled", "Differential Drive", "2-Legged"]),
                     battery = round(random.uniform(0.3,1.0),2),
                     load = 0,
                     position = spawner(sites)
@@ -247,7 +247,7 @@ def fig_display(fig, width, height, placement, sites):
                 robots[robot_name] = Robot(
                     id = total_robots,
                     sensor = "Measurement",
-                    locomotion = random.choice(["Aerial", "4-Wheeled", "Differential Drive", "2-Legged"]),
+                    locomotion = random.choice(["Drone", "4-Wheeled", "Differential Drive", "2-Legged"]),
                     battery = round(random.uniform(0.3,1.0),2),
                     load = 0,
                     position = spawner(sites)
@@ -337,17 +337,17 @@ def fig_display(fig, width, height, placement, sites):
 
 ### define values: ###
 
-buffer = 4  # spacing used to scale back spawnable space from the border
+buffer = 6  # spacing used to scale back spawnable space from the border
 resolution = 0.05
 w_frac = 0.60
 h_frac = 0.80
 
-generate_image(500,500)
-
 ### function calls to set up map: ###
 
 # Step 1 - read map:
-body, border = read_map('edited_map.png')
+
+map_name = input("Please enter name of map with file extension: ")
+body, border = read_map(map_name)
 
 # Step 2 - determine spawnable space:
 spawnable = np.array(spawnable_space(body,border,buffer))
@@ -372,7 +372,7 @@ for num in range(1, m+1):
             robots[robot_name] = Robot(
                 id = num,
                 sensor = "Camera",
-                locomotion = random.choice(["Aerial", "4-Wheeled", "Differential Drive", "2-Legged"]),
+                locomotion = random.choice(["Drone", "4-Wheeled", "Differential Drive", "2-Legged"]),
                 battery = round(random.uniform(0.3,1.0),2),
                 load = 0,
                 position = spawner(sites)
@@ -381,7 +381,7 @@ for num in range(1, m+1):
             robots[robot_name] = Robot(
                 id = num,
                 sensor = "Measurement",
-                locomotion = random.choice(["Aerial", "4-Wheeled", "Differential Drive", "2-Legged"]),
+                locomotion = random.choice(["Drone", "4-Wheeled", "Differential Drive", "2-Legged"]),
                 battery = round(random.uniform(0.3,1.0),2),
                 load = 0,
                 position = spawner(sites)
