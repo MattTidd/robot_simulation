@@ -10,7 +10,7 @@ import sys
 import tkinter as tk
 import subprocess
 import random
-import pathlib
+import pickle
 
 ########## Define Functions and Classes #########
 
@@ -207,8 +207,10 @@ def fig_display(fig, width, height, placement, sites):
 
     def spawn_task():
         nonlocal task_marker
-        x,y = random.choice(sites)
-        task_marker = ax.plot(x, y, 'ro', markersize = 2, label = 'Task')[0]
+        global task_location
+        task_x, task_y = random.choice(sites)
+        task_location = [task_x, task_y]
+        task_marker = ax.plot(task_x, task_y, 'ro', markersize = 2, label = 'Task')[0]
         update_display(robots)
 
     def terminate_figure_button():
@@ -217,6 +219,21 @@ def fig_display(fig, width, height, placement, sites):
         window.destroy()
         os._exit(0)
 
+    def save_button():
+
+        print("Saving Mission Specifications")
+        saved_dictionary = {
+            'robots' : robots,  # this is the dictionary of robots
+            'border' : border,  # this is the location of the borders in x,y coordinates
+            'body' : body,      # this is the location of the white space of the map in x,y coordinates
+            'sites' : sites,    # this is the location of the spawnable sites, scaled back from borders and evenly spaced
+            'task_location' : task_location # this is the location of the task
+        }
+
+        # save the dictionary to a file:
+        with open('new_saved_data.pkl', 'wb') as file:
+            pickle.dump(saved_dictionary, file)
+        
     def randomize_position_button():
         for id, robot in robots.items():
             robot.__setattr__('position', spawner(sites))
@@ -317,6 +334,10 @@ def fig_display(fig, width, height, placement, sites):
     # add a button to regenerate robots:
     randomize_robots_button = tk.Button(button_frame, text = "Regenerate Robots", command = generate_random_robots_button)
     randomize_robots_button.pack(side = tk.LEFT, padx = 5)
+
+    # add a button to save mission:
+    save_mission_button = tk.Button(button_frame, text = "Save Mission", command  = save_button)
+    save_mission_button.pack(side = tk.LEFT, padx = 5)
 
     # sidebar frame:
     sidebar_frame = tk.Frame(window, width = 750, bg = "lightgrey")
