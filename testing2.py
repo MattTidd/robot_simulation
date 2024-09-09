@@ -10,6 +10,7 @@ import sys
 import tkinter as tk
 import subprocess
 import random
+import pathlib
 
 ########## Define Functions and Classes #########
 
@@ -78,7 +79,8 @@ def generate_image(width, height):
     blank_image = np.ones((height, width, 3), dtype=np.uint8) * 205
 
     # specify path:
-    file_path = os.path.join(os.getcwd(),"\maps")
+    files_in_dir = os.listdir(os.getcwd())
+    file_path = os.path.join(os.getcwd(), files_in_dir[1])
 
     # write the image to variable that will return a flag for true or false
     a = cv2.imwrite(os.path.join(file_path, 'blank_image.png'), blank_image)
@@ -94,12 +96,14 @@ def read_map(map_name):
 
     # check if the provided string exists in the current working directory:
     map_str = str(map_name)
-    file_path = os.path.join(os.getcwd(),"\maps",map_str)
+    current_dir = os.getcwd()
+    files_in_dir = os.listdir(current_dir)
+    file_path = os.path.join(current_dir, files_in_dir[1], map_str)
 
     if not os.path.isfile(file_path):
         sys.exit('No such file exists')
     else:
-        image = (cv2.imread(map_str,0))
+        image = (cv2.imread(file_path,0))
 
     # white space detection:
     body = np.flip(np.column_stack(np.where(np.flipud(image) >= 254)),axis = 1)
@@ -337,6 +341,8 @@ buffer = 4  # spacing used to scale back spawnable space from the border
 resolution = 0.05
 w_frac = 0.60
 h_frac = 0.80
+
+generate_image(500,500)
 
 ### function calls to set up map: ###
 
