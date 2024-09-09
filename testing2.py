@@ -77,8 +77,11 @@ def generate_image(width, height):
     # generate a blank png for use in mapping:
     blank_image = np.ones((height, width, 3), dtype=np.uint8) * 205
 
+    # specify path:
+    file_path = os.path.join(os.getcwd(),"\maps")
+
     # write the image to variable that will return a flag for true or false
-    a = cv2.imwrite('blank_image.png', blank_image)
+    a = cv2.imwrite(os.path.join(file_path, 'blank_image.png'), blank_image)
 
     # verify that the image was actually created:
     if a == True:
@@ -87,11 +90,11 @@ def generate_image(width, height):
         print('Image saving failed')
 
 def read_map(map_name):
-    # this function reads a given map and determine the white space and the border:
+    # this function reads a given map and determines the white space and the border:
 
     # check if the provided string exists in the current working directory:
     map_str = str(map_name)
-    file_path = os.path.join(os.getcwd(),map_str)
+    file_path = os.path.join(os.getcwd(),"\maps",map_str)
 
     if not os.path.isfile(file_path):
         sys.exit('No such file exists')
