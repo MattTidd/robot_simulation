@@ -75,6 +75,15 @@ task_location = loaded_data['task_location']
 ## Open and display the robots:
 robot_dict = loaded_data['robots']
 
+robots_data = [
+    {'Robot ID': robot.id, 'Sensor Type': robot.sensor, 'Mode of Locomotion' : robot.locomotion, 'Movement Weight' : robot.weight, 'Battery Level' : robot.battery,
+     'Load History' : robot.load, 'Current Position' : robot.position}
+     for robot in robot_dict.values()
+]
+
+df = pd.DataFrame(robots_data)
+print(df.to_string(index=False, justify='center'))
+
 # inference system shit would go below here:
 
 
