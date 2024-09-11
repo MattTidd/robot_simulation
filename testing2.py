@@ -98,7 +98,7 @@ def read_map(map_name):
     map_str = str(map_name)
     current_dir = os.getcwd()
     files_in_dir = os.listdir(current_dir)
-    file_path = os.path.join(current_dir, files_in_dir[3], map_str)
+    file_path = os.path.join(current_dir, files_in_dir[files_in_dir.index('maps')], map_str)
 
     if not os.path.isfile(file_path):
         sys.exit('No such file exists')
