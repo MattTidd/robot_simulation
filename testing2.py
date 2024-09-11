@@ -36,7 +36,7 @@ class Robot:
         elif self.locomotion == "4-Wheeled":
             a = random.uniform(-0.10,0.10)
             self.weight = round(1.25 + a*random.random(),2)
-        elif self.locomotion == "Differential Drive":
+        elif self.locomotion == "Diff. Drive":
             a = random.uniform(-0.10,0.10)
             self.weight = round(1.50 + a*random.random(),2)
         elif self.locomotion == "2-Legged":
@@ -49,14 +49,14 @@ class Robot:
 
     # for when user wants to randomize the attributes of the robots:
     def randomize_attributes(self):
-        self.locomotion = random.choice(["Drone", "4-Wheeled", "Differential Drive", "2-Legged"])
+        self.locomotion = random.choice(["Drone", "4-Wheeled", "Diff. Drive", "2-Legged"])
         if self.locomotion == "Drone":
             a = random.uniform(-0.10,0.10)
             self.weight = round(1.00 + a*random.random(),2)
         elif self.locomotion == "4-Wheeled":
             a = random.uniform(-0.10,0.10)
             self.weight = round(1.25 + a*random.random(),2)
-        elif self.locomotion == "Differential Drive":
+        elif self.locomotion == "Diff. Drive":
             a = random.uniform(-0.10,0.10)
             self.weight = round(1.50 + a*random.random(),2)
         elif self.locomotion == "2-Legged":
@@ -98,7 +98,7 @@ def read_map(map_name):
     map_str = str(map_name)
     current_dir = os.getcwd()
     files_in_dir = os.listdir(current_dir)
-    file_path = os.path.join(current_dir, files_in_dir[1], map_str)
+    file_path = os.path.join(current_dir, files_in_dir[3], map_str)
 
     if not os.path.isfile(file_path):
         sys.exit('No such file exists')
@@ -255,7 +255,7 @@ def fig_display(fig, width, height, placement, sites):
                 robots[robot_name] = Robot(
                     id = total_robots,
                     sensor = "Camera",
-                    locomotion = random.choice(["Drone", "4-Wheeled", "Differential Drive", "2-Legged"]),
+                    locomotion = random.choice(["Drone", "4-Wheeled", "Diff. Drive", "2-Legged"]),
                     battery = round(random.uniform(0.3,1.0),2),
                     load = 0,
                     position = spawner(sites)
@@ -264,7 +264,7 @@ def fig_display(fig, width, height, placement, sites):
                 robots[robot_name] = Robot(
                     id = total_robots,
                     sensor = "Measurement",
-                    locomotion = random.choice(["Drone", "4-Wheeled", "Differential Drive", "2-Legged"]),
+                    locomotion = random.choice(["Drone", "4-Wheeled", "Diff. Drive", "2-Legged"]),
                     battery = round(random.uniform(0.3,1.0),2),
                     load = 0,
                     position = spawner(sites)
@@ -394,7 +394,7 @@ for num in range(1, m+1):
             robots[robot_name] = Robot(
                 id = num,
                 sensor = "Camera",
-                locomotion = random.choice(["Drone", "4-Wheeled", "Differential Drive", "2-Legged"]),
+                locomotion = random.choice(["Drone", "4-Wheeled", "Diff. Drive", "2-Legged"]),
                 battery = round(random.uniform(0.3,1.0),2),
                 load = 0,
                 position = spawner(sites)
@@ -403,7 +403,7 @@ for num in range(1, m+1):
             robots[robot_name] = Robot(
                 id = num,
                 sensor = "Measurement",
-                locomotion = random.choice(["Drone", "4-Wheeled", "Differential Drive", "2-Legged"]),
+                locomotion = random.choice(["Drone", "4-Wheeled", "Diff. Drive", "2-Legged"]),
                 battery = round(random.uniform(0.3,1.0),2),
                 load = 0,
                 position = spawner(sites)
