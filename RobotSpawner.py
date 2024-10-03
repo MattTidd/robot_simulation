@@ -25,43 +25,44 @@ class Robot:
     # - their position within space
 
     # constructor to initialize attributes:
-    def __init__(self, id, sensor, locomotion, battery, load, position):
+    def __init__(self, id, sensor, locomotion, battery, load, position, travelled_distance):
         self.id = id
         self.sensor = sensor
         self.locomotion = locomotion
 
         if self.locomotion == "Drone":
-            a = random.uniform(-0.10,0.10)
+            a = random.uniform(-0.05,0.05)
             self.weight = round(1.00 + a*random.random(),2)
         elif self.locomotion == "4-Wheeled":
             a = random.uniform(-0.10,0.10)
-            self.weight = round(1.25 + a*random.random(),2)
+            self.weight = round(1.00 + a*random.random(),2)
         elif self.locomotion == "Diff. Drive":
-            a = random.uniform(-0.10,0.10)
-            self.weight = round(1.50 + a*random.random(),2)
+            a = random.uniform(0.00,0.10)
+            self.weight = round(1.00 + a*random.random(),2)
         elif self.locomotion == "2-Legged":
-            a = random.uniform(-0.10,0.10)
-            self.weight = round(1.75 + a*random.random(),2)
+            a = random.uniform(0.00,0.15)
+            self.weight = round(1.00 + a*random.random(),2)
 
         self.battery = battery
         self.load = load
         self.position = position
+        self.travelled_distance = 0
 
     # for when user wants to randomize the attributes of the robots:
     def randomize_attributes(self):
         self.locomotion = random.choice(["Drone", "4-Wheeled", "Diff. Drive", "2-Legged"])
         if self.locomotion == "Drone":
-            a = random.uniform(-0.10,0.10)
+            a = random.uniform(-0.05,0.05)
             self.weight = round(1.00 + a*random.random(),2)
         elif self.locomotion == "4-Wheeled":
             a = random.uniform(-0.10,0.10)
-            self.weight = round(1.25 + a*random.random(),2)
+            self.weight = round(1.00 + a*random.random(),2)
         elif self.locomotion == "Diff. Drive":
-            a = random.uniform(-0.10,0.10)
-            self.weight = round(1.50 + a*random.random(),2)
+            a = random.uniform(0.00,0.10)
+            self.weight = round(1.00 + a*random.random(),2)
         elif self.locomotion == "2-Legged":
-            a = random.uniform(-0.10,0.10)
-            self.weight = round(1.75 + a*random.random(),2)
+            a = random.uniform(0.00,0.15)
+            self.weight = round(1.00 + a*random.random(),2)
         self.battery = round(random.uniform(0.3,1.0),2)
 
     # method of querying the class:
@@ -72,7 +73,8 @@ class Robot:
                 f"Movement Weight: {self.weight}\n"
                 f"Battery Level: {self.battery}\n"
                 f"Load History: {self.load}\n"
-                f"Current Position: {self.position} ")
+                f"Current Position: {self.position}\n"
+                f"Travelled Distance: {self.travelled_distance}")
     
 def generate_image(width, height):
     # generate a blank png for use in mapping:
@@ -233,6 +235,7 @@ def fig_display(fig, width, height, placement, sites):
         # save the dictionary to a file:
         with open('saved_data.pkl', 'wb') as file:
             pickle.dump(saved_dictionary, file)
+        print("Mission Saved!")
         
     def randomize_position_button():
         for id, robot in robots.items():
@@ -258,7 +261,8 @@ def fig_display(fig, width, height, placement, sites):
                     locomotion = random.choice(["Drone", "4-Wheeled", "Diff. Drive", "2-Legged"]),
                     battery = round(random.uniform(0.3,1.0),2),
                     load = 0,
-                    position = spawner(sites)
+                    position = spawner(sites),
+                    travelled_distance = 0
                 )
             else:
                 robots[robot_name] = Robot(
@@ -267,7 +271,8 @@ def fig_display(fig, width, height, placement, sites):
                     locomotion = random.choice(["Drone", "4-Wheeled", "Diff. Drive", "2-Legged"]),
                     battery = round(random.uniform(0.3,1.0),2),
                     load = 0,
-                    position = spawner(sites)
+                    position = spawner(sites),
+                    travelled_distance = 0
                 )
         update_display(robots)
         update_sidebar()
@@ -308,7 +313,8 @@ def fig_display(fig, width, height, placement, sites):
                            f"Movement Weight: {robot.weight}\n"
                            f"Position: {robot.position}\n"
                            f"Battery: {robot.battery}\n"
-                           f"Load History: {robot.load}")
+                           f"Load History: {robot.load}\n"
+                           f"Travelled Distance: {robot.travelled_distance}")
             
             robot_label = tk.Label(sidebar_frame, text=attributes, width=label_width, anchor='w', justify='left', padx=5, pady=2)
             robot_label.pack(anchor='w', padx=5, pady=2)
@@ -397,7 +403,8 @@ for num in range(1, m+1):
                 locomotion = random.choice(["Drone", "4-Wheeled", "Diff. Drive", "2-Legged"]),
                 battery = round(random.uniform(0.3,1.0),2),
                 load = 0,
-                position = spawner(sites)
+                position = spawner(sites),
+                travelled_distance = 0
             )
         else:
             robots[robot_name] = Robot(
@@ -406,7 +413,8 @@ for num in range(1, m+1):
                 locomotion = random.choice(["Drone", "4-Wheeled", "Diff. Drive", "2-Legged"]),
                 battery = round(random.uniform(0.3,1.0),2),
                 load = 0,
-                position = spawner(sites)
+                position = spawner(sites),
+                travelled_distance = 0
             )
 
 ### visualization through GUI: ###
@@ -418,14 +426,4 @@ fig.set_size_inches(fig_width / 100, fig_height / 100)
 
 fig_display(fig, fig_width, fig_height, (int(left), int(top)), sites)
 
-# storage:
-
-# ----------------------------------------------------------------------------
-
-# # convert to meters:
-
-# def pixel2meter(body, border, spawnable, sites, resolution):
-#     a, b, c, d = body*resolution, border*resolution, spawnable*resolution, sites*resolution
-#     return a, b, c, d
-
-# ----------------------------------------------------------------------------
+# end
