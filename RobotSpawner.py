@@ -424,6 +424,5 @@ fig_width, fig_height, left, top = get_position(w_frac, h_frac)
 fig = plt.figure()
 fig.set_size_inches(fig_width / 100, fig_height / 100)
 
+# call gui function:
 fig_display(fig, fig_width, fig_height, (int(left), int(top)), sites)
-
-# end
