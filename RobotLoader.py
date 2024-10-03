@@ -1,7 +1,12 @@
+########## Import Libraries ##########
 import pickle
 import numpy as np
 import random
 import pandas as pd
+import matplotlib.pyplot as plt
+import skfuzzy as fuzz
+
+## Define Functions and Classes:
 
 class Robot:
     # this is the class robot, wherein all robotic objects are made from. Robots consist of:
@@ -63,28 +68,39 @@ class Robot:
                 f"Load History: {self.load}\n"
                 f"Current Position: {self.position} ")
 
-with open('saved_data.pkl', 'rb') as file:
-    loaded_data = pickle.load(file)
+def load_robots():
+    with open('saved_data.pkl', 'rb') as file:
+        loaded_data = pickle.load(file)
 
-## Open the variables:
-body = loaded_data['body']
-border = loaded_data['border']
-sites = loaded_data['sites']
-task_location = loaded_data['task_location']
+    ## Open the variables:
+    body = loaded_data['body']
+    border = loaded_data['border']
+    sites = loaded_data['sites']
+    task_location = loaded_data['task_location']
 
-## Open and display the robots:
-robot_dict = loaded_data['robots']
+    ## Open and display the robots:
+    robot_dict = loaded_data['robots']
 
-robots_data = [
-    {'Robot ID': robot.id, 'Sensor Type': robot.sensor, 'Mode of Locomotion' : robot.locomotion, 'Movement Weight' : robot.weight, 'Battery Level' : robot.battery,
-     'Load History' : robot.load, 'Current Position' : robot.position}
-     for robot in robot_dict.values()
-]
+    robots_data = [
+        {'Robot ID': robot.id, 'Sensor Type': robot.sensor, 'Mode of Locomotion' : robot.locomotion, 'Movement Weight' : robot.weight, 'Battery Level' : robot.battery,
+        'Load History' : robot.load, 'Travelled Distance' : robot.travelled_distance, 'Current Position' : robot.position}
+        for robot in robot_dict.values()
+    ]
 
-df = pd.DataFrame(robots_data)
-print(df.to_string(index=False, justify='center'))
+    df = pd.DataFrame(robots_data)
+    print(df.to_string(index=False, justify='center'))
+    return body, border, sites, task_location
 
-# inference system shit would go below here:
+# def fis_design():
+
+#################     Main   #####################
+
+# load in the robots for the mission:
+body, border, sites, task_location = load_robots()
+
+
+
+
 
 
 
